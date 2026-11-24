@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>تطبيق المراجعة السريعة لعلم العروض — الكافي</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    :root {
+      --bg: #f4f7f4;
+      --card: #ffffff;
+      --card-soft: #f6f9f6;
+      --border: #d4e0d8;
+      --primary: #1b4332;
+      --primary-hover: #2d6a4f;
+      --accent: #b45309;
+      --accent-soft: #fef3c7;
+      --text: #1a202c;
+      --muted: #4b5563;
+      --danger: #b91c1c;
+      --danger-soft: #fee2e2;
+      --ok: #15803d;
+      --ok-soft: #dcfce7;
+    }
+    html.dark {
+      --bg: #0f172a;
+      --card: #1e293b;
+      --card-soft: #263449;
+      --border: #334155;
+      --primary: #34d399;
+      --primary-hover: #10b981;
+      --accent: #fbbf24;
+      --accent-soft: #3b2f13;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --danger: #f87171;
+      --danger-soft: #3b171b;
+      --ok: #4ade80;
+      --ok-soft: #123322;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Noto Naskh Arabic', 'Geeza Pro', 'SF Arabic', 'Noto Sans Arabic', 'Tahoma', serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      -webkit-tap-highlight-color: transparent;
+      overflow-x: hidden;
+    }
+    .ui-font {
+      font-family: 'Noto Kufi Arabic', 'SF Arabic', 'Noto Sans Arabic', 'Tahoma', sans-serif;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+    }
+    .card-soft {
+      background: var(--card-soft);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .btn-primary {
+      background: #1b4332;
+      color: #ffffff;
+      min-height: 44px;
+      border-radius: 10px;
+      font-weight: 700;
+      transition: transform 0.1s ease, opacity 0.15s ease;
+    }
+    html.dark .btn-primary {
+      background: #059669;
+      color: #ffffff;
+    }
+    .btn-primary:active { transform: scale(0.98); }
+    .btn-soft {
+      background: var(--card-soft);
+      color: var(--text);
+      border: 1px solid var(--border);
+      min-height: 44px;
+      border-radius: 10px;
+      font-weight: 600;
+      transition: background 0.15s ease, border-color 0.15s ease;
+    }
+    .btn-soft:hover { border-color: var(--primary); }
+    .pill {
+      min-height: 38px;
+      padding: 6px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-size: 0.92rem;
+      font-weight: 600;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .pill.active {
+      background: #1b4332;
+      color: #ffffff;
+      border-color: #1b4332;
+    }
+    html.dark .pill.active {
+      background: #059669;
+      border-color: #059669;
+    }
+    .nav-tab {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.92rem;
+      color: var(--muted);
+      background: transparent;
+      border: 1px solid transparent;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .nav-tab.active {
+      background: #1b4332;
+      color: #ffffff;
+    }
+    html.dark .nav-tab.active {
+      background: #059669;
+      color: #ffffff;
+    }
+    .sym {
+      display: inline-block;
+      direction: rtl;
+      unicode-bidi: bidi-override;
+      font-family: 'DejaVu Sans Mono', 'SF Mono', 'Courier New', monospace;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      color: var(--primary);
+    }
+    .taqti-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+    }
+    .taqti-table th, .taqti-table td {
+      border: 1px solid var(--border);
+      padding: 8px 6px;
+      text-align: center;
+    }
+    .taqti-table th {
+      background: var(--card-soft);
+      color: var(--primary);
+      font-weight: 700;
+      text-align: right;
+      padding-right: 10px;
+      width: 20%;
+    }
+    .halah-text {
+      color: var(--accent);
+      font-weight: 700;
+    }
+    .hidden-row {
+      display: none;
+    }
+    .char-box {
+      display: inline-flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      padding: 8px 6px;
+      border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: var(--card);
+      font-size: 1.15rem;
+      font-weight: 700;
+      transition: all 0.2s ease;
+    }
+    .char-box.dropped {
+      background: var(--danger-soft);
+      border-color: var(--danger);
+      color: var(--danger);
+      text-decoration: line-through;
+      opacity: 0.85;
+    }
+    .char-box.changed {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .char-box.added {
+      background: var(--ok-soft);
+      border-color: var(--ok);
+      color: var(--ok);
+    }
+    .flashcard {
+      min-height: 250px;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+    }
+    .flashcard:active { transform: scale(0.99); }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- TOP HEADER -->
+  <header class="sticky top-0 z-30 border-b" style="background: var(--card); border-color: var(--border);">
+    <div class="max-w-5xl mx-auto px-3 sm:px-5 py-2.5 flex items-center justify-between gap-2">
+      <div class="flex items-center gap-2.5 min-w-0">
+        <div class="w-9 h-9 rounded-xl flex items-center justify-center shrink-0 text-white font-bold ui-font" style="background:#1b4332;">ع</div>
+        <div class="min-w-0">
+          <h1 class="ui-font font-bold text-base sm:text-lg leading-tight truncate" style="color: var(--primary);">مُراجَعة عِلمِ العَرُوضِ السَّريعة</h1>
+          <p class="text-xs truncate" style="color: var(--muted);">الكافي (ص ٧٣–١٠٨) • ٧٤ شاهداً</p>
+        </div>
+      </div>
+      <button id="themeToggleBtn" type="button" class="btn-soft px-3 py-1.5 text-sm ui-font flex items-center gap-1.5 shrink-0" aria-label="تبديل الوضع النهاري والليلي">
+        <span id="themeIcon">🌙</span>
+        <span id="themeLabel">الوضع الليلي</span>
+      </button>
+    </div>
+
+    <!-- 5 MAIN TABS -->
+    <nav class="max-w-5xl mx-auto px-3 sm:px-5 pb-2.5 flex gap-1.5 overflow-x-auto no-scrollbar" aria-label="الأقسام الرئيسية">
+      <button type="button" class="nav-tab ui-font active" data-tab="lab">١. معمل التقطيع</button>
+      <button type="button" class="nav-tab ui-font" data-tab="flashcards">٢. البطاقات السريعة</button>
+      <button type="button" class="nav-tab ui-font" data-tab="simulator">٣. محاكي الزحاف والمعاقبة</button>
+      <button type="button" class="nav-tab ui-font" data-tab="dairah">٤. الدائرة الثالثة</button>
+      <button type="button" class="nav-tab ui-font" data-tab="exam">٥. محاكي الامتحان</button>
+    </nav>
+  </header>
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 max-w-5xl w-full mx-auto px-3 sm:px-5 py-4 sm:py-6">
+
+    <!-- ==================== TAB 1: معمل التقطيع ==================== -->
+    <section id="tab-lab" class="tab-panel space-y-4">
+      <div class="card p-3.5 sm:p-4 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2.5 justify-between">
+          <div id="labBahrFilters" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1 sm:pb-0"></div>
+          <input id="labSearchInput" type="search" placeholder="ابحث في الأبيات أو الزحاف..." class="w-full sm:w-64 px-3 py-2 rounded-xl border text-sm" style="background: var(--card-soft); border-color: var(--border); color: var(--text); min-height: 42px;">
+        </div>
+        <div class="flex flex-wrap items-center justify-between gap-2 text-sm" style="color: var(--muted);">
+          <span id="labCounter" class="ui-font font-semibold"></span>
+          <select id="labJumpSelect" class="px-3 py-1.5 rounded-lg border text-sm max-w-full sm:max-w-xs" style="background: var(--card-soft); border-color: var(--border); color: var(--text); min-height: 38px;" aria-label="اختر شاهداً"></select>
+        </div>
+      </div>
+
+      <div id="labCardContainer" class="card p-4 sm:p-5 space-y-4"></div>
+
+      <!-- Progressive Reveal Controls -->
+      <div class="card p-3.5 sm:p-4 space-y-3">
+        <div class="flex flex-wrap gap-2 items-center justify-between">
+          <div class="flex flex-wrap gap-2">
+            <button id="labStepBtn" type="button" class="btn-primary px-4 py-2 text-sm ui-font">اكشف الخطوة التالية</button>
+            <button id="labRevealAllBtn" type="button" class="btn-soft px-3.5 py-2 text-sm ui-font">إظهار الكل</button>
+            <button id="labHideAllBtn" type="button" class="btn-soft px-3.5 py-2 text-sm ui-font">إخفاء الكل</button>
+          </div>
+          <div class="flex gap-2">
+            <button id="labPrevBtn" type="button" class="btn-soft px-4 py-2 text-sm ui-font">السابق</button>
+            <button id="labNextBtn" type="button" class="btn-primary px-4 py-2 text-sm ui-font">التالي</button>
+          </div>
+        </div>
+        <p class="text-xs" style="color: var(--muted);">تلميح: استخدم «اكشف الخطوة التالية» لتختبر نفسك في الكتابة العروضية ثم الرموز ثم التفعيلات ثم الحالة قبل رؤية الحل كاملاً.</p>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 2: البطاقات السريعة ==================== -->
+    <section id="tab-flashcards" class="tab-panel hidden space-y-4">
+      <div class="card p-3.5 sm:p-4 flex flex-wrap items-center justify-between gap-2.5">
+        <div id="fcBahrFilters" class="flex gap-1.5 overflow-x-auto no-scrollbar"></div>
+        <div class="flex items-center gap-2">
+          <button id="fcHintToggleBtn" type="button" class="btn-soft px-3 py-1.5 text-xs ui-font">إظهار تلميح البحر</button>
+          <button id="fcShuffleBtn" type="button" class="btn-soft px-3 py-1.5 text-xs ui-font">خلط عشوائي</button>
+        </div>
+      </div>
+
+      <div id="fcCard" class="card flashcard p-5 sm:p-7 flex flex-col justify-between gap-4"></div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2.5">
+        <span id="fcCounter" class="text-sm ui-font font-semibold" style="color: var(--muted);"></span>
+        <div class="flex gap-2">
+          <button id="fcRequeueBtn" type="button" class="btn-soft px-4 py-2 text-sm ui-font">أعدها لاحقاً</button>
+          <button id="fcFlipBtn" type="button" class="btn-soft px-4 py-2 text-sm ui-font">اقلب البطاقة</button>
+          <button id="fcNextBtn" type="button" class="btn-primary px-5 py-2 text-sm ui-font">البطاقة التالية</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 3: محاكي الزحاف والمعاقبة ==================== -->
+    <section id="tab-simulator" class="tab-panel hidden space-y-5">
+      <!-- Part A: Tafilah Lab -->
+      <div class="card p-4 sm:p-5 space-y-4">
+        <div>
+          <h2 class="ui-font font-bold text-base sm:text-lg" style="color: var(--primary);">أولاً: مختبر التفعيلة (شاهد الحرف المحذوف أو المتغيّر)</h2>
+          <p class="text-sm" style="color: var(--muted);">اختر التفعيلة الأصلية ثم اضغط على أي زحاف أو علة لترى كيف تتحول التفعيلة خطوة بخطوة.</p>
+        </div>
+
+        <div id="simTafilahTabs" class="flex flex-wrap gap-2"></div>
+        <div id="simTransformBtns" class="flex flex-wrap gap-2"></div>
+
+        <div id="simTafilahOutput" class="card-soft p-4 space-y-3"></div>
+      </div>
+
+      <!-- Part B: Bahr Summary & Interactive Mu'aqabah / Mukanafah Tester -->
+      <div class="card p-4 sm:p-5 space-y-4">
+        <div>
+          <h2 class="ui-font font-bold text-base sm:text-lg" style="color: var(--primary);">ثانياً: بطاقة كل بحر وتجربة المعاقبة والمكانفة</h2>
+          <p class="text-sm" style="color: var(--muted);">اختر البحر لمراجعة أعاريضه وأضربه واستثناءاته، وجرّب بنفسك متى يُسمح باجتماع الزحافين ومتى يُمنع.</p>
+        </div>
+
+        <div id="simBahrTabs" class="flex gap-1.5 overflow-x-auto no-scrollbar pb-1"></div>
+        <div id="simBahrDetail" class="space-y-4"></div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 4: الدائرة الثالثة ==================== -->
+    <section id="tab-dairah" class="tab-panel hidden space-y-4">
+      <div class="card p-4 sm:p-5 space-y-4">
+        <div>
+          <h2 class="ui-font font-bold text-base sm:text-lg" style="color: var(--primary);">الدائرة الثالثة التفاعلية (دائرة المُشْتَبِه عند التبريزي)</h2>
+          <p class="text-sm" style="color: var(--muted);">اضغط على أي قاعدة من قواعد فكّ البحور الخمس (الكافي ص ٩٣–٩٤) لترى نقطة البداية وكيف ينتج البحر الجديد.</p>
+        </div>
+
+        <div id="dairahBtns" class="flex flex-wrap gap-2"></div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 items-center">
+          <div id="dairahSvgWrap" class="card-soft p-3 flex items-center justify-center"></div>
+          <div id="dairahExplainWrap" class="space-y-3"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== TAB 5: محاكي الامتحان ==================== -->
+    <section id="tab-exam" class="tab-panel hidden space-y-4">
+      <div id="examSetup" class="card p-4 sm:p-5 space-y-4">
+        <div>
+          <h2 class="ui-font font-bold text-base sm:text-lg" style="color: var(--primary);">إعداد اختبار سريع (من أمثلة وقواعد الكتاب فقط)</h2>
+          <p class="text-sm" style="color: var(--muted);">جميع الأسئلة مستخرجة مباشرة من شواهد وقواعد الكافي (ص ٧٣–١٠٨) بدون باب الخفيف.</p>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          <div>
+            <label for="examBahrSelect" class="block text-sm ui-font font-semibold mb-1.5">نطاق البحور</label>
+            <select id="examBahrSelect" class="w-full px-3 py-2 rounded-xl border text-sm" style="background: var(--card-soft); border-color: var(--border); color: var(--text); min-height: 44px;">
+              <option value="الكل">جميع البحور المقررة</option>
+              <option value="الهزج">باب الهزج</option>
+              <option value="الرجز">باب الرجز</option>
+              <option value="الرمل">باب الرمل</option>
+              <option value="السريع">باب السريع</option>
+              <option value="المنسرح">باب المنسرح</option>
+            </select>
+          </div>
+          <div>
+            <label for="examTypeSelect" class="block text-sm ui-font font-semibold mb-1.5">نوع الأسئلة</label>
+            <select id="examTypeSelect" class="w-full px-3 py-2 rounded-xl border text-sm" style="background: var(--card-soft); border-color: var(--border); color: var(--text); min-height: 44px;">
+              <option value="mixed">مختلط (شواهد + صح وخطأ + قواعد)</option>
+              <option value="verses">شواهد الكتاب (تحديد البحر والنوع)</option>
+              <option value="tf">صح وخطأ (الزحاف والعلل والمعاقبة)</option>
+              <option value="mcq">اختيار من متعدد (قواعد وفكّ الدائرة)</option>
+            </select>
+          </div>
+          <div>
+            <label for="examCountSelect" class="block text-sm ui-font font-semibold mb-1.5">عدد الأسئلة</label>
+            <select id="examCountSelect" class="w-full px-3 py-2 rounded-xl border text-sm" style="background: var(--card-soft); border-color: var(--border); color: var(--text); min-height: 44px;">
+              <option value="5">٥ أسئلة (مراجعة خاطفة)</option>
+              <option value="10" selected>١٠ أسئلة (متوسط)</option>
+              <option value="15">١٥ سؤالاً (شامل)</option>
+            </select>
+          </div>
+        </div>
+
+        <button id="examStartBtn" type="button" class="btn-primary w-full sm:w-auto px-6 py-2.5 text-sm ui-font">ابدأ الاختبار الآن</button>
+      </div>
+
+      <div id="examActive" class="hidden space-y-4">
+        <div class="card p-3.5 flex items-center justify-between gap-2 text-sm ui-font">
+          <span id="examProgressText" class="font-bold" style="color: var(--primary);"></span>
+          <span id="examScoreLive" class="font-bold" style="color: var(--accent);"></span>
+          <button id="examQuitBtn" type="button" class="btn-soft px-3 py-1 text-xs">تغيير الإعدادات</button>
+        </div>
+
+        <div id="examQuestionCard" class="card p-4 sm:p-6 space-y-4"></div>
+      </div>
+
+      <div id="examSummary" class="hidden card p-5 sm:p-6 space-y-4 text-center"></div>
+    </section>
+
+  </main>
+
+  <script src="./shawahid_part1.js"></script>
+  <script src="./shawahid_part2.js"></script>
+  <script src="./app_data.js"></script>
+  <script src="./app.js"></script>
+
+</body>
+</html>
